@@ -69,5 +69,49 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(\`🌐 App running on http://localhost:\${port}\`);
+  console.log(`🌐 App running on http://localhost:${port}`);
 });
+
+require('dotenv').config();
+const { Pool } = require('pg');
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+// Kiểm tra kết nối
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.error('Lỗi kết nối DB:', err);
+  } else {
+    console.log('Kết nối DB thành công:', res.rows[0]);
+  }
+});
+
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.send('<h1 style="color:blue;text-align:center;">Welcome to Your Colorful Node.js API 🎨</h1>');
+});
+
+// API GET tất cả dữ liệu (ví dụ với bảng "users")
+app.get('/api/users', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM users');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Lỗi khi truy vấn CSDL");
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server đang chạy tại http://localhost:${port}`);
+});
+
+
