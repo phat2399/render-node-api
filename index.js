@@ -104,3 +104,19 @@ app.get('/api/users', async (req, res) => {
 app.listen(port, () => {
   console.log(`🌐 App running on http://localhost:${port}`);
 });
+
+// Khởi tạo bảng nếu chưa có
+(async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL
+      );
+    `);
+    console.log("✅ Đã kiểm tra và tạo bảng 'users' nếu chưa tồn tại");
+  } catch (err) {
+    console.error("❌ Lỗi tạo bảng users:", err);
+  }
+})();
